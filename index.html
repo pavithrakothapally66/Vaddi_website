@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vaddi Calculator</title>
+
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        background: #f1f5f9;
+        color: #172554;
+        padding: 28px 16px;
+      }
+
+      .container {
+        max-width: 1100px;
+        margin: auto;
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      header h1 {
+        font-size: 34px;
+        color: #1d4ed8;
+        margin-bottom: 10px;
+      }
+
+      header p {
+        color: #64748b;
+        line-height: 1.6;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        align-items: start;
+      }
+
+      .card {
+        background: white;
+        border-radius: 15px;
+        padding: 26px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.06);
+      }
+
+      h2 {
+        font-size: 23px;
+        margin-bottom: 24px;
+      }
+
+      .field {
+        margin-bottom: 20px;
+      }
+
+      label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 9px;
+      }
+
+      input,
+      select {
+        display: block;
+        width: 100%;
+        padding: 13px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        font-size: 16px;
+        background: white;
+        color: #172554;
+      }
+
+      input:focus,
+      select:focus {
+        outline: 2px solid #93c5fd;
+        border-color: #2563eb;
+      }
+
+      .buttons {
+        display: flex;
+        gap: 12px;
+        margin-top: 25px;
+      }
+
+      button {
+        flex: 1;
+        padding: 14px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      .calculate-btn {
+        background: #2563eb;
+        color: white;
+      }
+
+      .calculate-btn:hover {
+        background: #1d4ed8;
+      }
+
+      .reset-btn {
+        background: #e2e8f0;
+        color: #172554;
+      }
+
+      .reset-btn:hover {
+        background: #cbd5e1;
+      }
+
+      .result-box {
+        padding: 20px;
+        border-radius: 11px;
+        margin-bottom: 15px;
+      }
+
+      .duration-box {
+        background: #f3e8ff;
+      }
+
+      .interest-box {
+        background: #dbeafe;
+      }
+
+      .total-box {
+        background: #dcfce7;
+      }
+
+      .result-box p {
+        color: #475569;
+        margin-bottom: 9px;
+      }
+
+      .result-box h3 {
+        font-size: 25px;
+        overflow-wrap: anywhere;
+      }
+
+      .duration-box h3 {
+        color: #7e22ce;
+      }
+
+      .interest-box h3 {
+        color: #1d4ed8;
+      }
+
+      .total-box h3 {
+        color: #15803d;
+      }
+
+      .details {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 16px;
+      }
+
+      .details h3 {
+        margin-bottom: 10px;
+      }
+
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 11px 0;
+        border-bottom: 1px solid #e2e8f0;
+        font-size: 14px;
+      }
+
+      .detail-row span:last-child {
+        text-align: right;
+        overflow-wrap: anywhere;
+      }
+
+      .detail-row:last-child {
+        border-bottom: none;
+        font-weight: bold;
+      }
+
+      .error {
+        color: #dc2626;
+        background: #fef2f2;
+        border-radius: 7px;
+        padding: 10px;
+        margin-top: 15px;
+        font-size: 14px;
+      }
+
+      [hidden] {
+        display: none !important;
+      }
+
+      .note {
+        background: #fffbeb;
+        border: 1px solid #fcd34d;
+        color: #78350f;
+        border-radius: 10px;
+        padding: 18px;
+        margin-top: 24px;
+        line-height: 1.7;
+      }
+
+      .note ul {
+        padding-left: 22px;
+        margin-top: 8px;
+      }
+
+      @media (max-width: 750px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+
+        header h1 {
+          font-size: 27px;
+        }
+
+        .card {
+          padding: 19px;
+        }
+
+        .result-box h3 {
+          font-size: 22px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <header>
+        <h1>💰 Vaddi Calculator</h1>
+        <p>Calculate the duration, interest and final amount easily.</p>
+      </header>
+
+      <div class="layout">
+        <!-- INPUT SECTION -->
+        <section class="card">
+          <h2>Input Details</h2>
+
+          <div class="field">
+            <label for="principal">Principal Amount (₹)</label>
+            <input
+              type="number"
+              id="principal"
+              min="0.01"
+              step="0.01"
+              placeholder="Enter amount"
+              value="100000"
+            />
+          </div>
+
+          <div class="field">
+            <label for="rate">Interest in rupee for 100</label>
+            <input
+              type="number"
+              id="rate"
+              min="0"
+              step="any"
+              placeholder="Enter rate"
+              value="2"
+            />
+          </div>
+
+          <div class="field">
+            <label for="rateType">Interest Type</label>
+            <select id="rateType">
+              <option value="traditional">
+                ₹ per ₹100 per month (Traditional Vaddi)
+              </option>
+              <option value="monthly">Percentage per month</option>
+              <option value="yearly">Percentage per year</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="startDate">Start Date</label>
+            <input type="date" id="startDate" value="2022-06-05" />
+          </div>
+
+          <div class="field">
+            <label for="endDate">End Date</label>
+            <input type="date" id="endDate" value="2024-03-16" />
+          </div>
+
+          <div class="buttons">
+            <button
+              type="button"
+              class="calculate-btn"
+              onclick="calculateInterest()"
+            >
+              Calculate
+            </button>
+
+            <button type="button" class="reset-btn" onclick="resetCalculator()">
+              Reset
+            </button>
+          </div>
+
+          <p id="error" class="error" role="alert" hidden></p>
+        </section>
+
+        <!-- RESULTS SECTION -->
+        <section class="card">
+          <h2>Calculation Results</h2>
+
+          <div class="result-box duration-box">
+            <p>📅 Time Period</p>
+            <h3 id="duration">1 year, 9 months, 11 days</h3>
+            <p id="totalDays">Total days: 650</p>
+          </div>
+
+          <div class="result-box interest-box">
+            <p>📈 Interest Amount</p>
+            <h3 id="interestAmount">₹42,733.33</h3>
+          </div>
+
+          <div class="result-box total-box">
+            <p>💵 Final Amount (Principal + Interest)</p>
+            <h3 id="finalAmount">₹1,42,733.33</h3>
+          </div>
+
+          <div class="details">
+            <h3>Calculation Breakdown</h3>
+
+            <div class="detail-row">
+              <span>Principal</span>
+              <span id="dPrincipal">₹1,00,000.00</span>
+            </div>
+
+            <div class="detail-row">
+              <span>Interest Rate</span>
+              <span id="dRate">₹2 per ₹100/month</span>
+            </div>
+
+            <div class="detail-row">
+              <span>Complete Months</span>
+              <span id="dMonths">21</span>
+            </div>
+
+            <div class="detail-row">
+              <span>Extra Days</span>
+              <span id="dDays">11</span>
+            </div>
+
+            <div class="detail-row">
+              <span>Interest for Complete Months</span>
+              <span id="dFullInterest">₹42,000.00</span>
+            </div>
+
+            <div class="detail-row">
+              <span>Interest for Extra Days</span>
+              <span id="dExtraInterest">₹733.33</span>
+            </div>
+
+            <div class="detail-row">
+              <span>Total Interest</span>
+              <span id="dInterest">₹42,733.33</span>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="note">
+        <strong>Note:</strong>
+        <ul>
+          <li>This calculator uses simple interest.</li>
+          <li>₹2 traditional vaddi means ₹2 for every ₹100 per month.</li>
+          <li>
+            Extra days for monthly interest are calculated using a 30-day month.
+          </li>
+          <li>
+            Yearly percentage interest uses elapsed calendar days divided by
+            365.
+          </li>
+          <li>Reset clears the inputs so you can enter a new calculation.</li>
+        </ul>
+      </div>
+    </div>
+
+    <script>
+      // Format numbers as Indian Rupees
+      function formatMoney(amount) {
+        return (
+          "₹" +
+          amount.toLocaleString("en-IN", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })
+        );
+      }
+
+      // Parse date inputs safely using local calendar dates
+      function parseDate(value) {
+        const parts = value.split("-").map(Number);
+        return new Date(parts[0], parts[1] - 1, parts[2]);
+      }
+
+      // Calculate calendar years, months and remaining days
+      function getDateDifference(start, end) {
+        let years = end.getFullYear() - start.getFullYear();
+        let months = end.getMonth() - start.getMonth();
+        let days = end.getDate() - start.getDate();
+
+        if (days < 0) {
+          months--;
+
+          const previousMonthDays = new Date(
+            end.getFullYear(),
+            end.getMonth(),
+            0,
+          ).getDate();
+
+          days += previousMonthDays;
+        }
+
+        if (months < 0) {
+          years--;
+          months += 12;
+        }
+
+        const startUTC = Date.UTC(
+          start.getFullYear(),
+          start.getMonth(),
+          start.getDate(),
+        );
+
+        const endUTC = Date.UTC(
+          end.getFullYear(),
+          end.getMonth(),
+          end.getDate(),
+        );
+
+        const totalDays = Math.round((endUTC - startUTC) / 86400000);
+
+        return { years, months, days, totalDays };
+      }
+
+      // Display an error message
+      function showError(message) {
+        document.getElementById("error").textContent = message;
+        document.getElementById("error").hidden = false;
+      }
+
+      // MAIN CALCULATION FUNCTION
+      function calculateInterest() {
+        try {
+          const principal = Number(document.getElementById("principal").value);
+
+          const rateInput = document.getElementById("rate").value;
+          const rate = Number(rateInput);
+
+          const rateType = document.getElementById("rateType").value;
+          const startValue = document.getElementById("startDate").value;
+          const endValue = document.getElementById("endDate").value;
+
+          document.getElementById("error").hidden = true;
+
+          if (principal <= 0 || !Number.isFinite(principal)) {
+            showError("Please enter a principal amount greater than zero.");
+            return;
+          }
+
+          if (rateInput.trim() === "" || !Number.isFinite(rate) || rate < 0) {
+            showError("Please enter a valid, non-negative interest rate.");
+            return;
+          }
+
+          if (!startValue || !endValue) {
+            showError("Please select both start and end dates.");
+            return;
+          }
+
+          const start = parseDate(startValue);
+          const end = parseDate(endValue);
+
+          if (end < start) {
+            showError("End date must be on or after the start date.");
+            return;
+          }
+
+          const diff = getDateDifference(start, end);
+          const completeMonths = diff.years * 12 + diff.months;
+
+          let interest;
+          let fullInterest;
+          let extraInterest;
+          let rateLabel;
+
+          if (rateType === "traditional" || rateType === "monthly") {
+            // Traditional ₹2 vaddi = 2% per month
+            const monthlyRate = rate / 100;
+            const monthlyInterest = principal * monthlyRate;
+
+            fullInterest = monthlyInterest * completeMonths;
+            extraInterest = (monthlyInterest * diff.days) / 30;
+
+            interest = fullInterest + extraInterest;
+
+            rateLabel =
+              rateType === "traditional"
+                ? "₹" + rate + " per ₹100/month"
+                : rate + "% per month";
+          } else {
+            // Simple annual interest, prorated by elapsed days
+            interest = (principal * (rate / 100) * diff.totalDays) / 365;
+
+            fullInterest = interest;
+            extraInterest = 0;
+
+            rateLabel = rate + "% per year";
+          }
+
+          const finalAmount = principal + interest;
+
+          let durationParts = [];
+
+          if (diff.years > 0) {
+            durationParts.push(
+              diff.years + (diff.years === 1 ? " year" : " years"),
+            );
+          }
+
+          if (diff.months > 0) {
+            durationParts.push(
+              diff.months + (diff.months === 1 ? " month" : " months"),
+            );
+          }
+
+          if (diff.days > 0 || durationParts.length === 0) {
+            durationParts.push(
+              diff.days + (diff.days === 1 ? " day" : " days"),
+            );
+          }
+
+          // Update the results on the page
+          document.getElementById("duration").textContent =
+            durationParts.join(", ");
+
+          document.getElementById("totalDays").textContent =
+            "Total days: " + diff.totalDays;
+
+          document.getElementById("interestAmount").textContent =
+            formatMoney(interest);
+
+          document.getElementById("finalAmount").textContent =
+            formatMoney(finalAmount);
+
+          document.getElementById("dPrincipal").textContent =
+            formatMoney(principal);
+
+          document.getElementById("dRate").textContent = rateLabel;
+
+          document.getElementById("dMonths").textContent = completeMonths;
+
+          document.getElementById("dDays").textContent = diff.days;
+
+          document.getElementById("dFullInterest").textContent =
+            formatMoney(fullInterest);
+
+          document.getElementById("dExtraInterest").textContent =
+            formatMoney(extraInterest);
+
+          document.getElementById("dInterest").textContent =
+            formatMoney(interest);
+        } catch (error) {
+          console.error("Calculation error:", error);
+          showError("Something went wrong. Please check the inputs.");
+        }
+      }
+
+      // RESET FUNCTION: clear inputs and results
+      function resetCalculator() {
+        document.getElementById("principal").value = "";
+        document.getElementById("rate").value = "";
+        document.getElementById("rateType").value = "traditional";
+        document.getElementById("startDate").value = "";
+        document.getElementById("endDate").value = "";
+
+        document.getElementById("error").hidden = true;
+
+        document.getElementById("duration").textContent = "--";
+        document.getElementById("totalDays").textContent = "Total days: --";
+        document.getElementById("interestAmount").textContent = "₹0.00";
+        document.getElementById("finalAmount").textContent = "₹0.00";
+
+        document.getElementById("dPrincipal").textContent = "₹0.00";
+        document.getElementById("dRate").textContent = "--";
+        document.getElementById("dMonths").textContent = "0";
+        document.getElementById("dDays").textContent = "0";
+        document.getElementById("dFullInterest").textContent = "₹0.00";
+        document.getElementById("dExtraInterest").textContent = "₹0.00";
+        document.getElementById("dInterest").textContent = "₹0.00";
+      }
+
+      // Calculate the default example when the page opens
+      calculateInterest();
+    </script>
+  </body>
+</html>
